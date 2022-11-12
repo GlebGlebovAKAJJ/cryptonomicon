@@ -19,6 +19,12 @@
             placeholder="Например DOGE"
           />
         </div>
+        <div
+          v-if="dupplicateTicker"
+          class="text-sm text-red-600"
+        >
+          Такой тикер уже добавлен
+        </div>
       </div>
     </div>
     <add-button
@@ -37,6 +43,7 @@ export default {
   data() {
     return {
       ticker: '',
+      dupplicateTicker: false,
     };
   },
   props: {
@@ -54,11 +61,27 @@ export default {
       if (this.ticker.length === 0) {
         return;
       }
+
+      const tickersData = JSON.parse(
+        localStorage.getItem('cryptonomicon-list')
+      );
+      for (let tickerData of tickersData) {
+        if (this.ticker === tickerData.name) {
+          this.dupplicateTicker = true;
+          return;
+        }
+      }
       this.$emit('add-ticker', this.ticker);
       this.ticker = '';
     },
+
     capitalizeTicker() {
       this.ticker = this.ticker.toUpperCase();
+    },
+  },
+  watch: {
+    ticker() {
+      this.dupplicateTicker = false;
     },
   },
 };

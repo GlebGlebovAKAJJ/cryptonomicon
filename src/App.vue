@@ -169,8 +169,6 @@ export default {
         );
       });
     }
-
-    setInterval(this.updateTickers, 5000);
   },
   mounted() {
     window.addEventListener('resize', this.calculateMaxGraphElements);
@@ -261,7 +259,6 @@ export default {
         name: ticker,
         price: '-',
       };
-
       this.tickers = [...this.tickers, currentTicker];
       this.filter = '';
       subscribeToTicker(currentTicker.name, (newPrice) =>
