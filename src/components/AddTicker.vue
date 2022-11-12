@@ -9,6 +9,7 @@
         >
         <div class="mt-1 relative rounded-md shadow-md">
           <input
+            @input="capitalizeTicker"
             v-model="ticker"
             @keydown.enter="add"
             type="text"
@@ -33,6 +34,11 @@ export default {
   components: {
     AddButton,
   },
+  data() {
+    return {
+      ticker: '',
+    };
+  },
   props: {
     disabled: {
       type: Boolean,
@@ -43,11 +49,6 @@ export default {
   emits: {
     'add-ticker': (value) => typeof value === 'string' && value.length > 0,
   },
-  data() {
-    return {
-      ticker: '',
-    };
-  },
   methods: {
     add() {
       if (this.ticker.length === 0) {
@@ -55,6 +56,9 @@ export default {
       }
       this.$emit('add-ticker', this.ticker);
       this.ticker = '';
+    },
+    capitalizeTicker() {
+      this.ticker = this.ticker.toUpperCase();
     },
   },
 };
