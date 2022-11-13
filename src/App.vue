@@ -119,8 +119,8 @@
 </template>
 
 <!-- 
-1. Сделать валидацию input, который добавляет тикер. (При добавлении такой же крипты, должна происходить остановка добавлении крипты и warningMessage 'такой тикер уже добавлен'). Также должен учитываться регистр написания (API https://min-api.cryptocompare.com/data/all/coinlist?summary=true) 
-2. При введении валюты в полне инпута должны появляться подсказки (autocomplete), которые дают  соответсвие крипто валюты  в процессе ее написания в инпут (максимум 4 предложения)   
+ [DONE] 1. Сделать валидацию input, который добавляет тикер. (При добавлении такой же крипты, должна происходить остановка добавлении крипты и warningMessage 'такой тикер уже добавлен'). Также должен учитываться регистр написания (API https://min-api.cryptocompare.com/data/all/coinlist?summary=true) 
+ [in the process] 2. При введении валюты в поле инпута должны появляться подсказки (autocomplete), которые дают  соответсвие крипто валюты  в процессе ее написания в инпут (максимум 4 предложения)   
 3. При добавлении любой несуществующей крипто валюты (в WS приходит message о том, что не существует данной монеты) изменять бэкграунд данной валюты в красный цвет.
 4. Если у добавленной монеты нет прямого курса (smth - USD), то ноужно реализовать кросс-конвертацию (smth - BTC - USD) и, чтобы данная проблема устранялась и появлялся курс.
 5. Так как можно открывать только один WS, то нужно реализовать логику работы API через нное количество вкладок с помощью  SharedWorker (ознакомиться).
@@ -144,6 +144,7 @@ export default {
       graph: [],
       page: 1,
       maxGraphElements: 1,
+      currencyName: [],
     };
   },
 
@@ -169,9 +170,11 @@ export default {
         );
       });
     }
+    this.getCurrencyName();
   },
   mounted() {
     window.addEventListener('resize', this.calculateMaxGraphElements);
+    console.log(this.currencyName);
   },
   computed: {
     tooManyTickersAdded() {
@@ -226,6 +229,16 @@ export default {
     //   }
     //   this.maxGraphElements = this.$refs.graph.clientWidth / 38;
     // },
+    getCurrencyName() {
+      return fetch(
+        'https://min-api.cryptocompare.com/data/all/coinlist?summary=true'
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          // const CurrencyName = new Map();
+          for (let curName in data.Data) this.currencyName.push(curName);
+        });
+    },
     updateTicker(tickerName, price) {
       this.tickers
         .filter((t) => t.name === tickerName)

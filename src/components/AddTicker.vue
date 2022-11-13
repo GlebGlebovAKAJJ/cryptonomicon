@@ -20,6 +20,32 @@
           />
         </div>
         <div
+          v-if="autocomplete"
+          class="flex bg-white shadow-md p-1 rounded-md shadow-md flex-wrap"
+        >
+          <span
+            class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
+          >
+            BTC
+          </span>
+          <span
+            class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
+          >
+            DOGE
+          </span>
+          <span
+            class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
+          >
+            BCH
+          </span>
+          <span
+            class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
+          >
+            CHD
+          </span>
+        </div>
+
+        <div
           v-if="dupplicateTicker"
           class="text-sm text-red-600"
         >
@@ -44,6 +70,7 @@ export default {
     return {
       ticker: '',
       dupplicateTicker: false,
+      autocomplete: false,
     };
   },
   props: {
