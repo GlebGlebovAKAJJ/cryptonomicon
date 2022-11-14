@@ -9,7 +9,9 @@
         >
         <div class="mt-1 relative rounded-md shadow-md">
           <input
-            @input="capitalizeTicker"
+            autocomplete="off"
+            @focus="modal = true"
+            @input="filterCoins"
             v-model="ticker"
             @keydown.enter="add"
             type="text"
@@ -20,28 +22,16 @@
           />
         </div>
         <div
-          v-if="autocomplete"
+          v-if="filteredCoinList && modal && ticker.length"
           class="flex bg-white shadow-md p-1 rounded-md shadow-md flex-wrap"
         >
           <span
+            v-for="coin in filteredCoinList.splice(0, 4)"
+            :key="coin"
+            @click="setCoin(coin)"
             class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
           >
-            BTC
-          </span>
-          <span
-            class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
-          >
-            DOGE
-          </span>
-          <span
-            class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
-          >
-            BCH
-          </span>
-          <span
-            class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
-          >
-            CHD
+            {{ coin }}
           </span>
         </div>
 
@@ -66,13 +56,20 @@ export default {
   components: {
     AddButton,
   },
+  created() {
+    this.getCurrencyName();
+  },
+
   data() {
     return {
       ticker: '',
       dupplicateTicker: false,
-      autocomplete: false,
+      coinList: [],
+      filteredCoinList: [],
+      modal: false,
     };
   },
+
   props: {
     disabled: {
       type: Boolean,
@@ -80,6 +77,7 @@ export default {
       default: false,
     },
   },
+
   emits: {
     'add-ticker': (value) => typeof value === 'string' && value.length > 0,
   },
@@ -102,10 +100,27 @@ export default {
       this.ticker = '';
     },
 
-    capitalizeTicker() {
+    filterCoins() {
+      this.filteredCoinList = this.coinList.filter((coin) => {
+        return coin.toUpperCase().startsWith(this.ticker.toUpperCase());
+      });
       this.ticker = this.ticker.toUpperCase();
     },
+
+    setCoin(coin) {
+      this.ticker = coin;
+      this.modal = false;
+    },
+
+    getCurrencyName() {
+      fetch('https://min-api.cryptocompare.com/data/all/coinlist?summary=true')
+        .then((response) => response.json())
+        .then((coinList) => {
+          for (let coinName in coinList.Data) this.coinList.push(coinName);
+        });
+    },
   },
+
   watch: {
     ticker() {
       this.dupplicateTicker = false;

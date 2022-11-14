@@ -144,7 +144,6 @@ export default {
       graph: [],
       page: 1,
       maxGraphElements: 1,
-      currencyName: [],
     };
   },
 
@@ -170,11 +169,9 @@ export default {
         );
       });
     }
-    this.getCurrencyName();
   },
   mounted() {
     window.addEventListener('resize', this.calculateMaxGraphElements);
-    console.log(this.currencyName);
   },
   computed: {
     tooManyTickersAdded() {
@@ -222,6 +219,17 @@ export default {
   },
 
   methods: {
+    add(ticker) {
+      const currentTicker = {
+        name: ticker,
+        price: '-',
+      };
+      this.tickers = [...this.tickers, currentTicker];
+      this.filter = '';
+      subscribeToTicker(currentTicker.name, (newPrice) =>
+        this.updateTicker(currentTicker.name, newPrice)
+      );
+    },
     // Выяснить почему в данном методе не дает определить размер окна (this.$refs.graph.clientWidth)
     // calculateMaxGraphElements() {
     //   if (!this.$refs.graph || this.$refs.graph === null) {
@@ -229,16 +237,6 @@ export default {
     //   }
     //   this.maxGraphElements = this.$refs.graph.clientWidth / 38;
     // },
-    getCurrencyName() {
-      return fetch(
-        'https://min-api.cryptocompare.com/data/all/coinlist?summary=true'
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          // const CurrencyName = new Map();
-          for (let curName in data.Data) this.currencyName.push(curName);
-        });
-    },
     updateTicker(tickerName, price) {
       this.tickers
         .filter((t) => t.name === tickerName)
@@ -265,18 +263,6 @@ export default {
         return price;
       }
       return price > 1 ? price.toFixed(2) : price.toPrecision(2);
-    },
-
-    add(ticker) {
-      const currentTicker = {
-        name: ticker,
-        price: '-',
-      };
-      this.tickers = [...this.tickers, currentTicker];
-      this.filter = '';
-      subscribeToTicker(currentTicker.name, (newPrice) =>
-        this.updateTicker(currentTicker.name, newPrice)
-      );
     },
 
     select(ticker) {
